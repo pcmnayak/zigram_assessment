@@ -1,0 +1,8 @@
+__pycache__
+.venv
+.vscode
+Misc.
+CITY
+NGO
+test_us_birmingham_files
+scraped_data.py
