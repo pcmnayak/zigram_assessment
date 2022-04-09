@@ -1,5 +1,4 @@
 import csv
-import json
 import os
 import re
 import time
@@ -21,6 +20,7 @@ def csv_generator(atm_list, city, atm_name=None):
         for values in atm_list.values():
             atm_writer.writerow(values)
         atm_file.close()
+    return True
             
 def get_atm_details(city, atm_name, url=None, driver=None):
     atm_details = {}
@@ -31,7 +31,6 @@ def get_atm_details(city, atm_name, url=None, driver=None):
     time.sleep(7)
     window_after = driver.window_handles[1]
     driver.switch_to.window(window_after)
-    print('switched to new window')
     
     #Store the specific atm page for logging/debugging and close the current window
     filename = f'./CITY/{city}/ATM_FILES/HTML/{atm_name}.html'
@@ -113,15 +112,7 @@ def get_atm_url():
     #Get the number of atm machines to list all the atm in the place
     atm_number = driver.find_element(by=By.XPATH, value='/html/body/div[3]/div/div/div/div[1]/h6').text
     atm_number = atm_number.split(':')[1].strip()
-    print(atm_number)
     first_window = driver.window_handles[0]
-    
-    '''
-    city = "Birmingham"
-    url_2 = 'https://coinatmradar.com/bitcoin_atm/50500/bitcoin-atm-genesis-coin-birmingham-roebuck-chevron/'
-    atm_name = 'Roebuck Chevron'
-    get_atm_details(city, atm_name, url_2, driver)
-    '''
     
     #Loading more chunks to get all the data
     num = 12 #default
@@ -152,14 +143,12 @@ def get_atm_url():
     atm_list = {}
     for idx, is_current_class in enumerate(details_url):
         driver.switch_to.window(first_window)
-        atm_name = is_current_class.find_all('a')[0].text
-        atm_url = is_current_class.find_all('a')[2]['href']
+        atm_name = is_current_class.find('div', class_='place').text.strip()
+        atm_url = is_current_class.find('div', class_='place').a['href'].strip()
         atm_list.update({idx:get_atm_details(city, atm_name, atm_url, driver)})
-        print(atm_list)
         
     csv_generator(atm_list, city)
-    return json.dumps(atm_list)
-    
+    return True
+
 if __name__ == '__main__':
-    # get_atm_url()
-    get_atm_details('Birmingham', 'Altadena Spirits')
+    get_atm_url()

@@ -1,4 +1,3 @@
-from fileinput import filename
 from . import app
 import csv
 import json
@@ -27,13 +26,17 @@ def ngo_details(ngo_details=None):
 
 @app.route("/display_atm_details/<city>")
 def atm_details(city):
+    atm_details_json = {}
+    fieldnames = ['ATM','Heading', 'Operator', 'Contact Details', 'email', 'City', 'Location', 'Address', 'Type', 'Fiat', 'Supported Coins']
+    
+    #read the csv file
     csvfilename = f'../CITY/{city}/ATM_FILES/CSV/consolidated_atm_list.csv'
     csvfile = open(csvfilename, 'r')
-    fieldnames = ['ATM','Heading', 'Operator', 'Contact Details', 'email', 'City', 'Location', 'Address', 'Type', 'Fiat', 'Supported Coins']
+    reader = csv.DictReader(csvfile)
+    
+    #convert it into json and store
     jsonfilename = f'../CITY/{city}/ATM_FILES/CSV/consolidated_atm_list.json'
     jsonfile = open(jsonfilename, 'w')
-    reader = csv.DictReader(csvfile)
-    atm_details_json = {}
     for idx, rows in enumerate(reader):
         atm_details_json[idx] = rows
     jsonfile.write(json.dumps(atm_details_json))
